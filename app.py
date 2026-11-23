@@ -1,13 +1,13 @@
 """
 Main Streamlit entry point and st.navigation router.
-Clean, restrained SaaS navigation with concise natural titles.
+Soft UI / Neumorphism design with a 5-page layperson-first story architecture.
 """
 
 import streamlit as st
 from utils.ui_components import inject_styles
 
 st.set_page_config(
-    page_title="Analisis & Forecasting Beban Listrik Panama",
+    page_title="Listrik Nasional Panama (2015–2020)",
     page_icon=":material/bolt:",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -16,19 +16,20 @@ st.set_page_config(
 inject_styles()
 
 pages = {
-    "Analisis Data & Evaluasi": [
-        st.Page("pages/0_Executive_Overview.py", title="Ringkasan", icon=":material/dashboard:", default=True),
-        st.Page("pages/1_Eksplorasi_&_Audit_Statistik.py", title="Eksplorasi & Audit Data", icon=":material/query_stats:"),
-        st.Page("pages/2_Evaluasi_Model_&_CV.py", title="Evaluasi Model & CV", icon=":material/compare_arrows:"),
-        st.Page("pages/3_Sensitivitas_Cuaca_&_COVID19.py", title="Cuaca, Libur, & COVID-19", icon=":material/thermostat:"),
+    "Cerita Utama": [
+        st.Page("pages/1_Beranda.py", title="Beranda & Ringkasan", icon=":material/home:", default=True),
+        st.Page("pages/2_Pola_dan_Faktor_Beban.py", title="Pola & Faktor Pemicu", icon=":material/wb_sunny:"),
+        st.Page("pages/3_Akurasi_Model.py", title="Perbandingan Model", icon=":material/verified:"),
     ],
-    "Proyeksi & Simulasi": [
-        st.Page("pages/4_Forecast_Jangka_Pendek_7Hari.py", title="Forecast 7 Hari", icon=":material/bolt:"),
-        st.Page("pages/5_Forecast_Jangka_Panjang_12Bulan.py", title="Forecast 12 Bulan", icon=":material/calendar_month:"),
-        st.Page("pages/6_Simulator_WhatIf.py", title="Simulator What-If", icon=":material/tune:"),
+    "Prediksi & Simulasi": [
+        st.Page("pages/4_Prediksi_Kebutuhan.py", title="Prediksi 7 Hari & 12 Bulan", icon=":material/trending_up:"),
+        st.Page("pages/5_Simulasi_Interaktif.py", title="Simulasi Coba Sendiri", icon=":material/tune:"),
     ],
 }
 
 pg = st.navigation(pages)
-st.sidebar.caption("Dataset: Beban Listrik Panama (2015–2020 · 48.048 jam)")
+st.sidebar.markdown(
+    '<div class="neu-sidebar-note"><b>Panduan Singkat</b><br>1 GWh = 1.000 MWh<br>Data Nasional Panama 2015–2020 (48.048 jam observasi).</div>',
+    unsafe_allow_html=True,
+)
 pg.run()

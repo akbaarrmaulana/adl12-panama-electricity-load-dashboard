@@ -1,29 +1,27 @@
 # Analisis & Forecasting Beban Listrik Panama (2015–2020)
 
-Dashboard interaktif berbasis **Streamlit** dan **streamlit-shadcn-ui** untuk analisis statistik eksploratif, *backtesting* & validasi silang model, dampak kausal COVID-19 (2020), serta proyeksi beban listrik jangka pendek (`7` hari / `168` jam) dan jangka panjang (`12` bulan / `8.760` jam).
+Dashboard interaktif berbasis **Streamlit** dengan gaya desain **Soft UI / Neumorphism** dan struktur *progressive disclosure* (ramah pembaca awam di layar utama, detail statistik tersimpan rapi di laci `expander`) untuk analisis beban listrik nasional Panama, dampak cuaca & COVID-19, perbandingan model, serta simulasi proyeksi ke depan.
 
-## Fitur & Halaman Utama
+## Fitur & Struktur 5 Halaman Utama
 
-1. **Ringkasan (`app.py` -> `pages/0_Executive_Overview.py`)** — Ringkasan eksekutif metrik dataset (`48.048` jam), linimasa 3 rezim beban listrik, dan peta 3 stasiun cuaca utama Panama.
-2. **Eksplorasi & Audit Data** — Profil harian `24` jam lintas tahun (`2015–2020`), analisis spektral FFT & ACF, uji multikolinearitas VIF, dan *dual-axis explorer*.
-3. **Evaluasi Model & CV** — Perbandingan performa 5 model (`Seasonal Naive`, `SARIMA`, `SARIMAX`, `GAM`, `HistGradientBoosting`) dengan uji Diebold-Mariano, *expanding-window* `TimeSeriesSplit` 3-fold, dan audit diagnostik residual.
-4. **Cuaca, Libur, & COVID-19** — Kurva sensitivitas non-linear GAM, efek `22` kategori `Holiday_ID`, uji *placebo* `2019`, analisis *counterfactual* `Mar–Jun 2020`, serta *feature importance* (XAI).
-5. **Forecast 7 Hari (`168` Jam)** — Proyeksi jangka pendek `HistGradientBoosting` beserta interval prediksi `90%` (`Q05–Q95`) dan peringatan beban puncak interaktif.
-6. **Forecast 12 Bulan (`8.760` Jam)** — Proyeksi eksogen murni `GAM Set A` pada skenario Pemulihan Normal vs Tekanan COVID-19 serta simulator pemulihan & anomali suhu.
-7. **Simulator What-If** — Simulasi interaktif profil beban `24` jam untuk variasi suhu, kelembapan, kecepatan angin, hari libur, dan kondisi pandemi.
+1. **Beranda & Ringkasan (`app.py` -> `pages/1_Beranda.py`)** — 4 KPI inti berbahasa sehari-hari, 3 kartu temuan terpenting, grafik tren historis `2015–2020`, serta peta 3 stasiun cuaca utama Panama.
+2. **Pola & Faktor Pemicu (`pages/2_Pola_dan_Faktor_Beban.py`)** — Tersusun dalam 3 tab fokus (*Pola Jam & Hari*, *Cuaca & Hari Libur*, *Dampak Pandemi COVID-19*), dengan audit statistik lanjutan (FFT, ACF, VIF, ADF/KPSS, XAI, & 8 titik *blackout*) tersimpan rapi di laci ekspander.
+3. **Perbandingan Model (`pages/3_Akurasi_Model.py`)** — Peringkat akurasi 5 metode dalam bahasa awam (*Boosting* terbaik `7` hari vs *GAM* terbaik `12` bulan vs metode dasar klasik), grafik zoom mingguan interaktif, serta detail *Cross-Validation* 3-fold & uji Diebold-Mariano di ekspander.
+4. **Prediksi 7 Hari & 12 Bulan (`pages/4_Prediksi_Kebutuhan.py`)** — 2 tab proyeksi ke depan: operasional **7 hari / 168 jam** (dengan peringatan kapasitas siaga dinamis) dan perencanaan **12 bulan / 8.760 jam** (Skenario Pulih Normal vs Pandemi Berlanjut + pengatur skenario kustom).
+5. **Simulasi Coba Sendiri (`pages/5_Simulasi_Interaktif.py`)** — Simulator *What-If* 24 jam dengan 5 tombol skenario cepat 1 klik (*Hari Kerja Normal*, *Cuaca Panas Terik*, *Akhir Pekan Santai*, *Libur Nasional*, *Pembatasan / Pandemi*) serta pengatur suhu, kelembapan, hari libur, sekolah, dan pandemi.
 
 ## Struktur Direktori
 
 ```text
 .
-├── app.py                              # Entrypoint Streamlit & st.navigation
+├── app.py                              # Entrypoint Streamlit & st.navigation (5 halaman)
 ├── requirements.txt                    # Dependensi Python (dipin agar kompatibel dengan artefak .pkl)
-├── .streamlit/config.toml              # Konfigurasi tema Clean SaaS Light
-├── assets/styles.css                   # Tipografi & layout minimal
+├── .streamlit/config.toml              # Konfigurasi tema Soft UI (#EAEFF5 / #3B6EF6)
+├── assets/styles.css                   # Styling Neumorphism, tab, expander, kartu KPI, & callout
 ├── artifacts/                          # Data terproses (.parquet, .json) & model terlatih (.pkl)
-├── pages/                              # Halaman-halaman dashboard Streamlit
+├── pages/                              # 5 halaman dashboard berbahasa mudah dipahami
 ├── scripts/build_artifacts.py          # Pipeline offline pembentuk artefak dari notebook/data mentah
-├── utils/                              # Loader data, visualisasi Matplotlib/Plotly, & inferensi
+├── utils/                              # Loader data, visualisasi Matplotlib/Plotly Soft UI, & inferensi
 ├── Analisis_Beban_Listrik_Panama_2015-2020.ipynb
 └── Panama_beban_listrik_per_jam_2015-2020_.xlsx
 ```
