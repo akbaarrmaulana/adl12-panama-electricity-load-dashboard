@@ -66,3 +66,15 @@ def load_gbm_full():
 @st.cache_resource(show_spinner=False)
 def load_preprocessors():
     return joblib.load(os.path.join(ART_DIR, "preprocessors.pkl"))
+
+
+@st.cache_data(show_spinner=False)
+def load_transfer_learning():
+    json_path = os.path.join(ART_DIR, "transfer_learning.json")
+    with open(json_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@st.cache_data(show_spinner=False)
+def load_transfer_learning_series():
+    return _load_table("transfer_learning_series")

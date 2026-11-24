@@ -777,3 +777,83 @@ def plot_mpl_whatif_delta_and_temp(sim_df, baseline_hourly_2019, hour_focus):
 
     plt.tight_layout()
     return fig
+
+
+def plot_mpl_transfer_learning_ranking(tl_summary_df):
+    work = tl_summary_df.sort_values("RMSE", ascending=True).reset_index(drop=True)
+    clrs = [
+        "#0D9488" if kat == "Transfer Learning" else ("#D97706" if kat == "Tanpa Transfer" else "#E11D48")
+        for kat in work["Kategori"]
+    ]
+    fig, axes = plt.subplots(1, 2, figsize=(13.4, 4.3))
+    y = np.arange(len(work))
+
+    b1 = axes[0].barh(y, work["MAPE_%"], color=clrs, height=0.58)
+    axes[0].set_yticks(y)
+    axes[0].set_yticklabels(work["Model"], fontsize=8.5)
+    axes[0].invert_yaxis()
+    axes[0].set_xlim(0, max(work["MAPE_%"]) * 1.24)
+    axes[0].set_xlabel("Rata-rata Meleset (%)")
+    axes[0].set_title("A. Tingkat Meleset Saat Lockdown (% MAPE — Makin Kecil Makin Baik)")
+    axes[0].grid(True, axis="x", color="#E2E8F0")
+    axes[0].grid(False, axis="y")
+    for bar, v in zip(b1, work["MAPE_%"]):
+        axes[0].text(v + 0.18, bar.get_y() + bar.get_height() / 2, f"{v:.2f}%", va="center", fontsize=8.5, fontweight="bold", color="#1E293B")
+
+    b2 = axes[1].barh(y, work["RMSE"], color=clrs, height=0.58)
+    axes[1].set_yticks(y)
+    axes[1].set_yticklabels(["" for _ in y])
+    axes[1].invert_yaxis()
+    axes[1].set_xlim(0, max(work["RMSE"]) * 1.24)
+    axes[1].set_xlabel("Selisih Energi RMSE (MWh)")
+    axes[1].set_title("B. Selisih Prediksi di Masa Lockdown (16 Apr – 27 Jun 2020)")
+    axes[1].grid(True, axis="x", color="#E2E8F0")
+    axes[1].grid(False, axis="y")
+    for bar, v in zip(b2, work["RMSE"]):
+        axes[1].text(v + 2.5, bar.get_y() + bar.get_height() / 2, f"{v:.1f} MWh", va="center", fontsize=8.5, fontweight="bold", color="#1E293B")
+
+    plt.tight_layout()
+    return fig
+
+
+def make_transfer_learning_timeline(tl_series_df, selected_cols):
+    cols = ["nat_demand"] + [c for c in selected_cols if c in tl_series_df.columns]
+    daily = tl_series_df.set_index("datetime")[cols].resample("D").mean().reset_index()
+
+    style_map = {
+        "pred_direct_gbm": ("Tanpa Adaptasi (Boosting Source)", COLORS["red"], "dash"),
+        "pred_direct_mlp": ("Tanpa Adaptasi (MLP Source)", "#FB7185", "dot"),
+        "pred_scratch_gbm": ("Latih dari Nol di Target (744j)", COLORS["amber"], "dashdot"),
+        "pred_tl_gbm": ("TL-2: Tree Warm-Start Transfer (Boosting)", COLORS["emerald"], "solid"),
+        "pred_tl_mlp": ("TL-1: Neural Net Fine-Tuning (MLP)", COLORS["blue"], "solid"),
+        "pred_tl_gam_adapter": ("TL-3: Frozen GAM + Residual Adapter", "#6366F1", "dot"),
+    }
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=daily["datetime"],
+            y=daily["nat_demand"],
+            mode="lines",
+            name="Pemakaian Aktual Lockdown",
+            line=dict(color=COLORS["actual"], width=2.4),
+        )
+    )
+    for col in selected_cols:
+        if col in style_map and col in daily.columns:
+            lbl, clr, dash = style_map[col]
+            fig.add_trace(
+                go.Scatter(
+                    x=daily["datetime"],
+                    y=daily[col],
+                    mode="lines",
+                    name=lbl,
+                    line=dict(color=clr, width=1.9, dash=dash),
+                )
+            )
+    return apply_clean_plotly_layout(
+        fig,
+        title="Lintasan Harian Uji Adaptasi Transfer Learning (16 Apr – 27 Jun 2020)",
+        height=395,
+        y_title="Rata-rata Harian (MWh)",
+    )
